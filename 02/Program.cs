@@ -10,11 +10,13 @@ namespace _02
     {
         static void Main(string[] args)
         {
-            int intCountValidPassWord = 0;
+            int intdPassWordAValid = 0;
+            int intdPassWordBValid = 0;
             System.Collections.Generic.List<PasswordVerificatorBE> lstPassword = null;
             
             lstPassword = mGetInputValues();
-            intCountValidPassWord = mCountValidPassword(lstPassword);
+            (intdPassWordAValid, intdPassWordBValid) = mCountValidPassword(lstPassword);
+
         }
 
         static private System.Collections.Generic.List<PasswordVerificatorBE> mGetInputValues()
@@ -42,28 +44,36 @@ namespace _02
             return lstInput;
         }
 
-        private static int mCountValidPassword(System.Collections.Generic.List<PasswordVerificatorBE> vlstPassword)
+        private static (int,int) mCountValidPassword(System.Collections.Generic.List<PasswordVerificatorBE> vlstPassword)
         {
-            int intCountValidPassWord = 0;
+            int intdPassWordAValid = 0;
+            int intdPassWordBValid = 0;
 
-            foreach(PasswordVerificatorBE objCurrentPasswordVerificatorBE in vlstPassword)
+            foreach (PasswordVerificatorBE objCurrentPasswordVerificatorBE in vlstPassword)
             {
-                if(objCurrentPasswordVerificatorBE.PasswordIsValid())
+                if(objCurrentPasswordVerificatorBE.PasswordAIsValid())
                 {
-                    intCountValidPassWord++;
+                    intdPassWordAValid++;
+                }
+                if (objCurrentPasswordVerificatorBE.PasswordBIsValid())
+                {
+                    intdPassWordBValid++;
                 }
             }
 
-            return intCountValidPassWord;
+            return (intdPassWordAValid, intdPassWordBValid);
         }
     }
 
     public class PasswordVerificatorBE
     {
-        public int Min { get; private set; }
-        public int Max { get; private set; }
+        public int MinA { get; private set; }
+        public int MaxA { get; private set; }
         public char CharToCheck { get; private set; }
         public string Password { get; private set; }
+
+        public int FirtsB { get; private set; }
+        public int SecondB { get; private set; }
 
         public PasswordVerificatorBE(string vstrAllInfos)
         {
@@ -75,20 +85,38 @@ namespace _02
 
             if(strSepareInfos.GetUpperBound(0) == 3)
             {
-                this.Min = Convert.ToInt32(strSepareInfos[0]);
-                this.Max = Convert.ToInt32(strSepareInfos[1]);
+                this.MinA = Convert.ToInt32(strSepareInfos[0]);
+                this.MaxA = Convert.ToInt32(strSepareInfos[1]);
                 this.CharToCheck = Convert.ToChar(strSepareInfos[2]);
                 this.Password = strSepareInfos[3];
+
+                this.FirtsB = Convert.ToInt32(strSepareInfos[0]) - 1;
+                this.SecondB  = Convert.ToInt32(strSepareInfos[1]) -1;
             }
         }
 
-        public bool PasswordIsValid()
+        public bool PasswordAIsValid()
         {
             int intCountCharToCheck = 0;
 
             intCountCharToCheck = this.Password.Count(c => c == this.CharToCheck);
 
-            return intCountCharToCheck >= this.Min && intCountCharToCheck <= this.Max;
+            return intCountCharToCheck >= this.MinA && intCountCharToCheck <= this.MaxA;
+        }
+        public bool PasswordBIsValid()
+        {
+            bool bolPassWordBIsValid = false;
+
+            if(this.Password.Length - 1 >= this.SecondB )
+            {
+                if (this.Password[this.FirtsB] == this.CharToCheck && this.Password[this.SecondB] != this.CharToCheck ||
+                    this.Password[this.SecondB] == this.CharToCheck && this.Password[this.FirtsB] != this.CharToCheck)
+                {
+                    bolPassWordBIsValid = true;
+                }
+            }
+
+            return bolPassWordBIsValid;
         }
     }
 }
