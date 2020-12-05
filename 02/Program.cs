@@ -10,17 +10,20 @@ namespace _02
     {
         static void Main(string[] args)
         {
-            System.Collections.Generic.List<PasswordVerificator> lstPassword = null;
+            int intCountValidPassWord = 0;
+            System.Collections.Generic.List<PasswordVerificatorBE> lstPassword = null;
+            
             lstPassword = mGetInputValues();
+            intCountValidPassWord = mCountValidPassword(lstPassword);
         }
 
-        static private System.Collections.Generic.List<PasswordVerificator> mGetInputValues()
+        static private System.Collections.Generic.List<PasswordVerificatorBE> mGetInputValues()
         {
             string strInputPath = "";
             string strCurrentLine = "";
-            PasswordVerificator objPasswordVerificator = null;
+            PasswordVerificatorBE objPasswordVerificatorBE = null;
 
-            System.Collections.Generic.List<PasswordVerificator> lstInput = new List<PasswordVerificator>();
+            System.Collections.Generic.List<PasswordVerificatorBE> lstInput = new List<PasswordVerificatorBE>();
 
             strInputPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\input.txt";
 
@@ -31,25 +34,38 @@ namespace _02
                     while (!objStreamReader.EndOfStream)
                     {
                         strCurrentLine = objStreamReader.ReadLine();
-                        objPasswordVerificator = new PasswordVerificator(strCurrentLine);
-                        lstInput.Add(objPasswordVerificator);
+                        objPasswordVerificatorBE = new PasswordVerificatorBE(strCurrentLine);
+                        lstInput.Add(objPasswordVerificatorBE);
                     }
                 }
-
             }
             return lstInput;
         }
 
+        private static int mCountValidPassword(System.Collections.Generic.List<PasswordVerificatorBE> vlstPassword)
+        {
+            int intCountValidPassWord = 0;
+
+            foreach(PasswordVerificatorBE objCurrentPasswordVerificatorBE in vlstPassword)
+            {
+                if(objCurrentPasswordVerificatorBE.PasswordIsValid())
+                {
+                    intCountValidPassWord++;
+                }
+            }
+
+            return intCountValidPassWord;
+        }
     }
 
-    public class PasswordVerificator
+    public class PasswordVerificatorBE
     {
-        public int Min { get; set; }
-        public int Max { get; set; }
-        public char CharToCheck { get; set; }
-        public string Password { get; set; }
+        public int Min { get; private set; }
+        public int Max { get; private set; }
+        public char CharToCheck { get; private set; }
+        public string Password { get; private set; }
 
-        public PasswordVerificator(string vstrAllInfos)
+        public PasswordVerificatorBE(string vstrAllInfos)
         {
             string[] strSepareInfos;
             vstrAllInfos = vstrAllInfos.Replace(" ", "-");
@@ -57,18 +73,22 @@ namespace _02
 
             strSepareInfos = vstrAllInfos.Split('-');
 
-            this.Min = Convert.ToInt32(strSepareInfos[0]);
-            this.Max = Convert.ToInt32(strSepareInfos[1]);
-            this.CharToCheck = Convert.ToChar(strSepareInfos[2]);
-            this.Password = strSepareInfos[3];
+            if(strSepareInfos.GetUpperBound(0) == 3)
+            {
+                this.Min = Convert.ToInt32(strSepareInfos[0]);
+                this.Max = Convert.ToInt32(strSepareInfos[1]);
+                this.CharToCheck = Convert.ToChar(strSepareInfos[2]);
+                this.Password = strSepareInfos[3];
+            }
         }
 
         public bool PasswordIsValid()
         {
-            bool bolValid = false;
+            int intCountCharToCheck = 0;
 
-            return bolValid;
+            intCountCharToCheck = this.Password.Count(c => c == this.CharToCheck);
+
+            return intCountCharToCheck >= this.Min && intCountCharToCheck <= this.Max;
         }
-
     }
 }
